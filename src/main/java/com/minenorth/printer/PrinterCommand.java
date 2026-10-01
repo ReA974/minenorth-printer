@@ -53,18 +53,14 @@ public class PrinterCommand {
     public static void register(RegisterCommandsEvent e) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("printer").executes(guard(PrinterCommand::help));
 
-        for (String n : new String[]{"help", "aide"})
-            root.then(Commands.literal(n).executes(guard(PrinterCommand::help)));
+
+        root.then(Commands.literal("help").executes(guard(PrinterCommand::help)));
         root.then(Commands.literal("info").executes(guard(PrinterCommand::info)));
-        for (String n : new String[]{"break", "casser"})
-            root.then(Commands.literal(n).executes(guard(PrinterCommand::breakPrinter)));
         root.then(Commands.literal("give").executes(guard(PrinterCommand::give)));
-        for (String n : new String[]{"speed", "vitesse"})
-            root.then(Commands.literal(n).then(Commands.literal("set")
+        root.then(Commands.literal("speed").then(Commands.literal("set")
                     .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.1))
                             .executes(guard(PrinterCommand::setSpeed)))));
-        for (String n : new String[]{"power", "batterie"})
-            root.then(Commands.literal(n).then(Commands.literal("set")
+        root.then(Commands.literal("power").then(Commands.literal("set")
                     .then(Commands.argument("value", IntegerArgumentType.integer(0))
                             .executes(guard(PrinterCommand::setPower)))));
 
@@ -88,10 +84,9 @@ public class PrinterCommand {
         p.sendSystemMessage(TextUtil.color(""));
         p.sendSystemMessage(TextUtil.color("&4=&a-&4=&a-&4=" + prefix + "&a-&4=&a-&4=&a-"));
         p.sendSystemMessage(TextUtil.color(""));
-        p.sendSystemMessage(TextUtil.color("&7-> &a/Printer speed/Vitesse set (Number) &b[&3Pour Modifier la vitesse du Printer&b]"));
-        p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Power/Batterie set (Number) &b[&3Pour Modifier la Batterie du Printer&b]"));
+        p.sendSystemMessage(TextUtil.color("&7-> &a/Printer speed set (Number) &b[&3Pour Modifier la vitesse du Printer&b]"));
+        p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Power set (Number) &b[&3Pour Modifier la Batterie du Printer&b]"));
         p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Info &b[&3Pour Voir les Information du Printer&b]"));
-        p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Break/Casser &b[&3Pour casser un Printer&b]"));
         p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Give &b[&3Give tous les outils et les Printers&b]"));
         p.sendSystemMessage(TextUtil.color("&7-> &a/Printer Help &b[&3Pour Avoir cette Aide&b]"));
         p.sendSystemMessage(TextUtil.color(""));

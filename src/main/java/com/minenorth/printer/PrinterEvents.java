@@ -1,6 +1,7 @@
 package com.minenorth.printer;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -31,6 +32,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import static com.minenorth.printer.PrinterConfig.BREAK_RADIUS;
+import static com.minenorth.printer.PrinterConfig.TIME_TO_BREAK;
 
 @Mod.EventBusSubscriber(modid = PrinterMod.MODID)
 public class PrinterEvents {
@@ -116,17 +121,53 @@ public class PrinterEvents {
         if (!(e.getLevel() instanceof ServerLevel level) || !(e.getPlayer() instanceof ServerPlayer player)) return;
         if (!PrinterConfig.isPrinterBlock(e.getState())) return;
 
+        BlockPos pos = e.getPos();
         PrinterData data = PrinterData.get(level);
-        PrinterData.State s = data.get(e.getPos());
+        PrinterData.State s = data.get(pos);
+
+        // 1. Si le joueur est le propriétaire, la casse est instantanée
         if (s != null && player.getUUID().equals(s.owner)) {
-            data.remove(e.getPos());
+            data.remove(pos);
             TextUtil.msg(player, PrinterConfig.MSG_BREAK.get());
             return;
         }
-        // Pas le propriétaire : on bloque la casse (admin : /printer break)
+
+        // 2. Ce n'est pas le propriétaire : on Annule la casse immédiate de Minecraft
         e.setCanceled(true);
-        if (player.hasPermissions(PrinterConfig.PERMISSION_LEVEL.get())) TextUtil.msg(player, PrinterConfig.MSG_BREAK_ADMIN.get());
-        else TextUtil.msg(player, PrinterConfig.MSG_BREAK_NO.get());
+
+        // Récupération du temps en secondes configuré (ex: 20s)
+        long secondsToBreak = TIME_TO_BREAK.get().longValue();
+        long millisToBreak = secondsToBreak * 1000L; // Conversion en millisecondes pour Thread.sleep
+
+        // 3. Alerte les joueurs situés dans un rayon de X blocs autour du printer
+        double radius = BREAK_RADIUS.get().doubleValue();
+        double radiusSq = radius * radius;
+        Vec3 center = pos.getCenter();
+
+        for (ServerPlayer nearPlayer : level.players()) {
+            if (nearPlayer.distanceToSqr(center) <= radiusSq) {
+                nearPlayer.sendSystemMessage(
+                        Component.literal("⚠ " + player.getScoreboardName() + " tente de détruire un printer près de vous ! Destruction dans " + secondsToBreak + "s.")
+                );
+            }
+        }
+
+        // 4. Lancement de la tâche différée en arrière-plan
+        CompletableFuture.runAsync(() -> {
+            try {
+                Thread.sleep(millisToBreak);
+            } catch (InterruptedException ignored) {}
+        }).thenAcceptAsync(v -> {
+            // Exécution sur le thread principal du serveur
+            level.getServer().execute(() -> {
+                // Vérifie que le bloc est toujours présent avant de le détruire
+                if (PrinterConfig.isPrinterBlock(level.getBlockState(pos))) {
+                    PrinterData.get(level).remove(pos);
+                    // destroyBlock simule la casse avec particules et drops (ou false si pas de drops)
+                    level.destroyBlock(pos, true);
+                }
+            });
+        });
     }
 
     // ------------------------------------------------------------------ clic droit
