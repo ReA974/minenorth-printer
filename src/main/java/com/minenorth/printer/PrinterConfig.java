@@ -27,7 +27,7 @@ public final class PrinterConfig {
 
     // ---- Gameplay ----
     public static final ForgeConfigSpec.IntValue PERMISSION_LEVEL, DEFAULT_CAPACITY, CAPACITY_STEP,
-            MAX_SPEED, INK_NEEDED, PRINT_STEPS, POWER_PER_STAGE, TIME_TO_BREAK,BREAK_RADIUS;
+            MAX_SPEED, INK_NEEDED, PRINT_STEPS, POWER_PER_STAGE, TIME_TO_BREAK, BREAK_RADIUS;
 
     // ---- Classes ----
     public static final ClassCfg SILVER, GOLD, PLATINE;
