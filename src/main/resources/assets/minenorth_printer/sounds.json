@@ -1,0 +1,8 @@
+{
+  "printer_running": {
+    "subtitle": "subtitles.minenorth_printer.printer_running",
+    "sounds": [
+      { "name": "minenorth_printer:printer_running", "stream": false, "attenuation_distance": 16 }
+    ]
+  }
+}

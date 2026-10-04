@@ -3,7 +3,6 @@ loaderVersion="${loader_version_range}"
 license="${mod_license}"
 
 [[mods]]
-
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
@@ -24,18 +23,10 @@ versionRange = "[1.20.1,1.21)"
 ordering = "NONE"
 side = "BOTH"
 
+# Les billets viennent du mod d'economie (optionnel au chargement, configurable)
 [[dependencies.${mod_id}]]
-modId = "yuushya"
+modId = "minenorth_eurobank"
 mandatory = false
-versionRange = "[0,)"
+versionRange = "[1.0.0,)"
 ordering = "AFTER"
 side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "mts"
-mandatory = false
-versionRange = "[0,)"
-ordering = "AFTER"
-side = "BOTH"
-
-
