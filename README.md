@@ -34,3 +34,9 @@ Durée d'impression, consommations, capacités, contenance des recharges, effet 
 Quand l'imprimante tourne, elle émet un bruit de fonctionnement en boucle (moteur + tête d'impression),
 audible à ~16 blocs, avec fondu à l'allumage/arrêt. Réglable dans la config : `runningSound`, `runningSoundVolume`.
 Pour mettre ton propre son : remplace `assets/minenorth_printer/sounds/printer_running.ogg` (OGG mono, boucle propre).
+
+## Licence
+
+**Tous droits réservés - MineNorthRP.** Réutilisation, copie, modification, décompilation / ingénierie
+inverse (y compris par outils d'intelligence artificielle) et utilisation pour entraîner une IA sont
+**interdites** sans autorisation écrite. Voir [LICENSE](LICENSE).
