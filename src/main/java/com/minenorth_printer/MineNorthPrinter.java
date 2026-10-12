@@ -18,7 +18,9 @@ public class MineNorthPrinter {
         ModRegistry.MENUS.register(bus);
         ModRegistry.SOUNDS.register(bus);
         ModRegistry.TABS.register(bus);
-        // Config SERVER : world/serverconfig/minenorth_printer-server.toml, synchronisée automatiquement aux clients
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PrinterConfig.SPEC);
+        // COMMON (dossier config/) et non SERVER (<monde>/serverconfig/, remis à zéro à chaque redémarrage) ; serveur dédié seulement : le client ne crée aucun fichier.
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER) {
+            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PrinterConfig.SPEC, "minenorth_printer-server.toml");
+        }
     }
 }
