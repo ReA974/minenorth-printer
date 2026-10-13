@@ -83,16 +83,12 @@ public final class ModRegistry {
             () -> IForgeMenuType.create(PrinterMenu::new));
 
     // ---- Onglet créatif ----
-    public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.minenorth_printer"))
-            .icon(() -> new ItemStack(PRINTER_ITEM.get()))
-            .displayItems((params, out) -> {
+    public static final net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator TAB_ITEMS = (params, out) -> {
                 out.accept(PRINTER_ITEM.get());
                 out.accept(INK_CARTRIDGE.get());
                 out.accept(INK_CARTRIDGE_LARGE.get());
                 out.accept(BATTERY.get());
                 out.accept(BATTERY_LARGE.get());
                 for (UpgradeType t : UpgradeType.values()) out.accept(UPGRADES.get(t).get());
-            })
-            .build());
+            };
 }

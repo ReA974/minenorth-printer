@@ -17,7 +17,6 @@ public class MineNorthPrinter {
         ModRegistry.BLOCK_ENTITIES.register(bus);
         ModRegistry.MENUS.register(bus);
         ModRegistry.SOUNDS.register(bus);
-        ModRegistry.TABS.register(bus);
         PrinterNetwork.register();
         // COMMON (dossier config/) et non SERVER (<monde>/serverconfig/, remis à zéro à chaque redémarrage) ; serveur dédié seulement : le client ne crée aucun fichier.
         if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER) {
