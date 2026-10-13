@@ -8,11 +8,13 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Configuration SERVER (world/serverconfig/minenorth_printer-server.toml).
- * Forge la synchronise aux clients à la connexion, donc les infobulles affichent les bonnes valeurs.
+ * Configuration COMMON du serveur dédié (config/minenorth_printer-server.toml).
+ * Envoyée aux clients à la connexion (PrinterNetwork), donc les infobulles et le bruit affichent les bonnes valeurs.
  * Les plafonds des valeurs restent sous 32 767 car l'interface les synchronise sur 16 bits.
  */
 public final class PrinterConfig {
@@ -117,16 +119,46 @@ public final class PrinterConfig {
         SPEC = b.build();
     }
 
-    /** Lecture sûre : renvoie la valeur par défaut si la config n'est pas encore chargée (menu principal...). */
+    /**
+     * Valeurs du serveur reçues à la connexion (la config est en COMMON, donc non synchronisée par Forge) : chemin -> valeur en texte.
+     * Vide = on lit la config locale / les valeurs par défaut.
+     */
+    private static volatile Map<String, String> remote = Map.of();
+
+    static void setRemote(Map<String, String> values) { remote = Map.copyOf(values); }
+
+    private static String key(ForgeConfigSpec.ConfigValue<?> v) { return String.join(".", v.getPath()); }
+
+    /** Valeurs actuelles de la config locale (ints, doubles, booléens) pour les envoyer aux clients. */
+    static Map<String, String> snapshot() {
+        Map<String, String> out = new LinkedHashMap<>();
+        for (ForgeConfigSpec.ConfigValue<?> v : List.of(PRINT_TIME_SECONDS, INK_PER_PRINT, ENERGY_PER_PRINT, BASE_INK_CAPACITY, ENERGY_CAPACITY,
+                TRANSFER_PER_TICK, ONLY_OWNER_CAN_OPEN, PRINT_SOUND, DESTROY_EMPTY_REFILLS, RUNNING_SOUND, RUNNING_SOUND_VOLUME, EUROS_PER_PRINT,
+                INK_CARTRIDGE, INK_CARTRIDGE_LARGE, BATTERY, BATTERY_LARGE, UPGRADE_MAX_LEVEL, SPEED_PER_LEVEL, INK_CAPACITY_PER_LEVEL,
+                YIELD_EUROS_PER_LEVEL, EFFICIENCY_PER_LEVEL)) {
+            Object val;
+            try { val = v.get(); } catch (Exception e) { val = v.getDefault(); }
+            out.put(key(v), String.valueOf(val));
+        }
+        return out;
+    }
+
+    /** Lecture sûre : valeur du serveur si reçue, sinon config locale, sinon valeur par défaut (config pas encore chargée). */
     public static int get(ForgeConfigSpec.IntValue v) {
+        String r = remote.get(key(v));
+        if (r != null) { try { return Integer.parseInt(r); } catch (NumberFormatException ignored) {} }
         try { return v.get(); } catch (Exception e) { return v.getDefault(); }
     }
 
     public static double get(ForgeConfigSpec.DoubleValue v) {
+        String r = remote.get(key(v));
+        if (r != null) { try { return Double.parseDouble(r); } catch (NumberFormatException ignored) {} }
         try { return v.get(); } catch (Exception e) { return v.getDefault(); }
     }
 
     public static boolean get(ForgeConfigSpec.BooleanValue v) {
+        String r = remote.get(key(v));
+        if (r != null) return Boolean.parseBoolean(r);
         try { return v.get(); } catch (Exception e) { return v.getDefault(); }
     }
 
