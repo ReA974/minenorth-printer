@@ -1,6 +1,7 @@
 {
   "itemGroup.minenorth_printer": "MineNorth – Imprimante",
   "block.minenorth_printer.printer": "Imprimante",
+  "block.minenorth_printer.printer_gold": "Imprimante dorée (VIP)",
   "item.minenorth_printer.ink_cartridge": "Cartouche d'encre",
   "item.minenorth_printer.ink_cartridge_large": "Grande cartouche d'encre",
   "item.minenorth_printer.battery": "Batterie",

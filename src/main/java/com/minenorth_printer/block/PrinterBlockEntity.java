@@ -145,7 +145,16 @@ public class PrinterBlockEntity extends BlockEntity implements MenuProvider {
 
     public int getCycleTicks() {
         double factor = Math.max(0.1, 1.0 - getLevel(UpgradeType.SPEED) * PrinterConfig.get(PrinterConfig.SPEED_PER_LEVEL));
-        return Math.max(20, (int) Math.round(PrinterConfig.get(PrinterConfig.PRINT_TIME_SECONDS) * 20 * factor));
+        return Math.max(20, (int) Math.round(PrinterConfig.get(PrinterConfig.PRINT_TIME_SECONDS) * 20 * factor * (isGold() ? PrinterBlock.GOLD_TIME_FACTOR : 1.0)));
+    }
+
+    private boolean isGold() {
+        return getBlockState().getBlock() instanceof PrinterBlock pb && pb.gold;
+    }
+
+    /** Imprimante dorée dont le propriétaire n'a plus le grade : elle s'arrête (il la retrouve en reprenant son grade). */
+    private boolean goldLocked(Level level) {
+        return isGold() && owner != null && level.getServer() != null && !PrinterBlock.goldAllowed(level.getServer(), owner);
     }
 
     public int getInkCost() {
@@ -158,8 +167,9 @@ public class PrinterBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public int getEurosPerPrint() {
-        return PrinterConfig.get(PrinterConfig.EUROS_PER_PRINT)
+        int base = PrinterConfig.get(PrinterConfig.EUROS_PER_PRINT)
                 + getLevel(UpgradeType.YIELD) * PrinterConfig.get(PrinterConfig.YIELD_EUROS_PER_LEVEL);
+        return isGold() ? (int) Math.round(base * PrinterBlock.GOLD_YIELD_FACTOR) : base;
     }
 
     // ---- Tick serveur ----
@@ -181,7 +191,7 @@ public class PrinterBlockEntity extends BlockEntity implements MenuProvider {
 
         List<ItemStack> money = makeMoney(getEurosPerPrint());
         PrinterStatus next;
-        if (!enabled) next = PrinterStatus.OFF;
+        if (!enabled || goldLocked(level)) next = PrinterStatus.OFF;
         else if (money.isEmpty()) next = PrinterStatus.CONFIG_ERROR;
         else if (ink < getInkCost()) next = PrinterStatus.NO_INK;
         else if (energy < getEnergyCost()) next = PrinterStatus.NO_ENERGY;

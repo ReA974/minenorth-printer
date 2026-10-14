@@ -56,6 +56,18 @@ public final class ModRegistry {
     public static final RegistryObject<Item> PRINTER_ITEM = ITEMS.register("printer",
             () -> new BlockItem(PRINTER.get(), new Item.Properties()));
 
+    /** Imprimante dorée : réservée aux grades qui ont l'avantage « imprimanteOr » (mod VIP) ; plus rapide et plus rentable. */
+    public static final RegistryObject<PrinterBlock> PRINTER_GOLD = BLOCKS.register("printer_gold", () -> new PrinterBlock(
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.GOLD)
+                    .strength(3.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .lightLevel(s -> s.getValue(PrinterBlock.LIT) ? 8 : 0), true));
+
+    public static final RegistryObject<Item> PRINTER_GOLD_ITEM = ITEMS.register("printer_gold",
+            () -> new BlockItem(PRINTER_GOLD.get(), new Item.Properties().rarity(net.minecraft.world.item.Rarity.RARE)));
+
     // ---- Recharges ----
     public static final RegistryObject<ChargeItem> INK_CARTRIDGE = ITEMS.register("ink_cartridge",
             () -> new ChargeItem(ChargeItem.Kind.INK, () -> PrinterConfig.get(PrinterConfig.INK_CARTRIDGE)));
@@ -77,7 +89,7 @@ public final class ModRegistry {
     // ---- Block entity / menu ----
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<BlockEntityType<PrinterBlockEntity>> PRINTER_BE = BLOCK_ENTITIES.register("printer",
-            () -> BlockEntityType.Builder.of(PrinterBlockEntity::new, PRINTER.get()).build(null));
+            () -> BlockEntityType.Builder.of(PrinterBlockEntity::new, PRINTER.get(), PRINTER_GOLD.get()).build(null));
 
     public static final RegistryObject<MenuType<PrinterMenu>> PRINTER_MENU = MENUS.register("printer",
             () -> IForgeMenuType.create(PrinterMenu::new));
@@ -85,6 +97,7 @@ public final class ModRegistry {
     // ---- Onglet créatif ----
     public static final net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator TAB_ITEMS = (params, out) -> {
                 out.accept(PRINTER_ITEM.get());
+                out.accept(PRINTER_GOLD_ITEM.get());
                 out.accept(INK_CARTRIDGE.get());
                 out.accept(INK_CARTRIDGE_LARGE.get());
                 out.accept(BATTERY.get());

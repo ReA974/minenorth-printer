@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "minenorth_printer:printer"
+    "minenorth_printer:printer",
+    "minenorth_printer:printer_gold"
   ]
 }

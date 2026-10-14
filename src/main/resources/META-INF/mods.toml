@@ -23,6 +23,13 @@ versionRange = "[1.20.1,1.21)"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies.${mod_id}]]
+modId = "minenorthapi"
+mandatory = true
+versionRange = "[1.1.0,2)"
+ordering = "AFTER"
+side = "BOTH"
+
 # Les billets viennent du mod d'economie (optionnel au chargement, configurable)
 [[dependencies.${mod_id}]]
 modId = "minenorth_eurobank"

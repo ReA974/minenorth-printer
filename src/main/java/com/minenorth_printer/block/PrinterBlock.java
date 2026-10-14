@@ -41,9 +41,26 @@ public class PrinterBlock extends BaseEntityBlock {
     /** Hitbox du modèle 3D (corps + capot + bac papier), identique dans les 4 orientations. */
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 10, 15);
 
+    /** Avantage de grade (mod VIP) qui donne accès à l'imprimante dorée. */
+    public static final String GOLD_PERK = "imprimanteOr";
+    /** Imprimante dorée : temps d'impression multiplié par ce facteur, billets imprimés multipliés par l'autre. */
+    public static final double GOLD_TIME_FACTOR = 0.5, GOLD_YIELD_FACTOR = 1.5;
+
+    public final boolean gold;
+
     public PrinterBlock(Properties props) {
+        this(props, false);
+    }
+
+    public PrinterBlock(Properties props, boolean gold) {
         super(props);
+        this.gold = gold;
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LIT, false));
+    }
+
+    /** Le joueur a-t-il le droit d'utiliser une imprimante dorée (grade VIP) ? */
+    public static boolean goldAllowed(net.minecraft.server.MinecraftServer server, java.util.UUID player) {
+        return fr.minenorth.api.MineNorth.grades().perk(server, player, GOLD_PERK, 0) > 0;
     }
 
     @Override
@@ -53,6 +70,10 @@ public class PrinterBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        if (gold && ctx.getPlayer() instanceof ServerPlayer sp && !goldAllowed(sp.server, sp.getUUID())) {
+            sp.displayClientMessage(Component.literal("§cImprimante dorée : réservée aux VIP."), true);
+            return null;
+        }
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
@@ -103,6 +124,10 @@ public class PrinterBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (player instanceof ServerPlayer sp && level.getBlockEntity(pos) instanceof PrinterBlockEntity be) {
+            if (gold && !goldAllowed(sp.server, sp.getUUID()) && !sp.hasPermissions(2)) {
+                sp.displayClientMessage(Component.literal("§cImprimante dorée : réservée aux VIP."), true);
+                return InteractionResult.CONSUME;
+            }
             if (PrinterConfig.get(PrinterConfig.ONLY_OWNER_CAN_OPEN) && !be.isOwner(sp) && !sp.hasPermissions(2)) {
                 sp.displayClientMessage(Component.translatable("message.minenorth_printer.not_owner"), true);
                 return InteractionResult.CONSUME;
