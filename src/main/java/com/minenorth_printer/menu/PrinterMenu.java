@@ -107,7 +107,7 @@ public class PrinterMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(access, player, ModRegistry.PRINTER.get());
+        return stillValid(access, player, ModRegistry.PRINTER.get()) || stillValid(access, player, ModRegistry.PRINTER_GOLD.get());
     }
 
     @Override
