@@ -43,8 +43,6 @@ public class PrinterBlock extends BaseEntityBlock {
 
     /** Avantage de grade (mod VIP) qui donne accès à l'imprimante dorée. */
     public static final String GOLD_PERK = "imprimanteOr";
-    /** Imprimante dorée : temps d'impression multiplié par ce facteur, billets imprimés multipliés par l'autre. */
-    public static final double GOLD_TIME_FACTOR = 0.5, GOLD_YIELD_FACTOR = 1.5;
 
     public final boolean gold;
 

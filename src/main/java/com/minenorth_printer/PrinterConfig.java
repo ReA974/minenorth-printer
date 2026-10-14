@@ -51,6 +51,7 @@ public final class PrinterConfig {
     public static final ForgeConfigSpec.IntValue INK_CAPACITY_PER_LEVEL;
     public static final ForgeConfigSpec.IntValue YIELD_EUROS_PER_LEVEL;
     public static final ForgeConfigSpec.DoubleValue EFFICIENCY_PER_LEVEL;
+    public static final ForgeConfigSpec.DoubleValue GOLD_TIME_FACTOR, GOLD_YIELD_FACTOR;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -116,6 +117,13 @@ public final class PrinterConfig {
                 .defineInRange("efficiencyPerLevel", 0.20, 0.0, 0.25);
         b.pop();
 
+        b.comment("Imprimante doree (reservee aux grades VIP avec l'avantage imprimanteOr)").push("gold");
+        GOLD_TIME_FACTOR = b.comment("Multiplicateur du temps d'impression (0.5 = deux fois plus rapide)")
+                .defineInRange("timeFactor", 0.5, 0.05, 1.0);
+        GOLD_YIELD_FACTOR = b.comment("Multiplicateur des euros imprimes par impression (1.5 = +50 %)")
+                .defineInRange("yieldFactor", 1.5, 1.0, 10.0);
+        b.pop();
+
         SPEC = b.build();
     }
 
@@ -135,7 +143,7 @@ public final class PrinterConfig {
         for (ForgeConfigSpec.ConfigValue<?> v : List.of(PRINT_TIME_SECONDS, INK_PER_PRINT, ENERGY_PER_PRINT, BASE_INK_CAPACITY, ENERGY_CAPACITY,
                 TRANSFER_PER_TICK, ONLY_OWNER_CAN_OPEN, PRINT_SOUND, DESTROY_EMPTY_REFILLS, RUNNING_SOUND, RUNNING_SOUND_VOLUME, EUROS_PER_PRINT,
                 INK_CARTRIDGE, INK_CARTRIDGE_LARGE, BATTERY, BATTERY_LARGE, UPGRADE_MAX_LEVEL, SPEED_PER_LEVEL, INK_CAPACITY_PER_LEVEL,
-                YIELD_EUROS_PER_LEVEL, EFFICIENCY_PER_LEVEL)) {
+                YIELD_EUROS_PER_LEVEL, EFFICIENCY_PER_LEVEL, GOLD_TIME_FACTOR, GOLD_YIELD_FACTOR)) {
             Object val;
             try { val = v.get(); } catch (Exception e) { val = v.getDefault(); }
             out.put(key(v), String.valueOf(val));

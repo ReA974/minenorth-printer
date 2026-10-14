@@ -145,7 +145,7 @@ public class PrinterBlockEntity extends BlockEntity implements MenuProvider {
 
     public int getCycleTicks() {
         double factor = Math.max(0.1, 1.0 - getLevel(UpgradeType.SPEED) * PrinterConfig.get(PrinterConfig.SPEED_PER_LEVEL));
-        return Math.max(20, (int) Math.round(PrinterConfig.get(PrinterConfig.PRINT_TIME_SECONDS) * 20 * factor * (isGold() ? PrinterBlock.GOLD_TIME_FACTOR : 1.0)));
+        return Math.max(20, (int) Math.round(PrinterConfig.get(PrinterConfig.PRINT_TIME_SECONDS) * 20 * factor * (isGold() ? PrinterConfig.get(PrinterConfig.GOLD_TIME_FACTOR) : 1.0)));
     }
 
     private boolean isGold() {
@@ -169,7 +169,7 @@ public class PrinterBlockEntity extends BlockEntity implements MenuProvider {
     public int getEurosPerPrint() {
         int base = PrinterConfig.get(PrinterConfig.EUROS_PER_PRINT)
                 + getLevel(UpgradeType.YIELD) * PrinterConfig.get(PrinterConfig.YIELD_EUROS_PER_LEVEL);
-        return isGold() ? (int) Math.round(base * PrinterBlock.GOLD_YIELD_FACTOR) : base;
+        return isGold() ? (int) Math.round(base * PrinterConfig.get(PrinterConfig.GOLD_YIELD_FACTOR)) : base;
     }
 
     // ---- Tick serveur ----
