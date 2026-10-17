@@ -24,7 +24,8 @@ final class PrinterNetwork {
     record ConfigMessage(Map<String, String> values) {}
 
     static void register() {
-        CHANNEL.registerMessage(0, ConfigMessage.class, PrinterNetwork::write, PrinterNetwork::read, PrinterNetwork::handle);
+        CHANNEL.registerMessage(0, ConfigMessage.class, PrinterNetwork::write, PrinterNetwork::read, PrinterNetwork::handle,
+                java.util.Optional.of(net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT));
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> {
             if (e.getEntity() instanceof ServerPlayer sp)
                 CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new ConfigMessage(PrinterConfig.snapshot()));
@@ -42,12 +43,18 @@ final class PrinterNetwork {
 
     private static ConfigMessage read(FriendlyByteBuf buf) {
         int n = buf.readVarInt();
+        if (n < 0 || n > 64) throw new io.netty.handler.codec.DecoderException("Config trop longue : " + n);
         Map<String, String> m = new LinkedHashMap<>();
-        for (int i = 0; i < n; i++) m.put(buf.readUtf(), buf.readUtf());
+        for (int i = 0; i < n; i++) m.put(buf.readUtf(128), buf.readUtf(64));
         return new ConfigMessage(m);
     }
 
     private static void handle(ConfigMessage msg, java.util.function.Supplier<NetworkEvent.Context> ctx) {
+        if (ctx.get().getDirection() != net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT
+                || net.minecraftforge.fml.loading.FMLEnvironment.dist != net.minecraftforge.api.distmarker.Dist.CLIENT) {
+            ctx.get().setPacketHandled(true);
+            return;
+        }
         ctx.get().enqueueWork(() -> PrinterConfig.setRemote(msg.values()));
         ctx.get().setPacketHandled(true);
     }
